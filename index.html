@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica de Ondas y Espectro</title>
+    <!-- Tailwind CSS para un diseño moderno y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX para renderizar LaTeX (Versión 0.16.9) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOV3CQDEZwgMAFdscFADSQLiCasiAcA5dAyMI3YtnRU9OFEdUT4z" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctMQanyES51" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilo "Espectro Pulsante" (Vibrante y profesional) */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0c0a09; /* Negro ligeramente off-black */
+            color: #d4d4d4; /* Gris claro para texto principal */
+            overflow-x: hidden;
+            background-image: linear-gradient(145deg, #1f2937 10%, #0c0a09 90%);
+        }
+
+        .quiz-panel {
+            background-color: #1a002b; /* Púrpura oscuro */
+            border: 1px solid #d8b4fe; /* Borde violeta claro */
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.4); /* Sombra neón */
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Animación de onda con CSS (simulando un espectro en movimiento) */
+        .wave-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px; /* Altura de la animación */
+            overflow: hidden;
+        }
+
+        /* Animación de onda con CSS */
+        .wave {
+            position: absolute;
+            width: 300%;
+            height: 100%;
+            top: 0;
+            left: -100%;
+            background: linear-gradient(to right, 
+                transparent 0%, 
+                #a78bfa 25%, 
+                transparent 50%, 
+                #d8b4fe 75%, 
+                transparent 50%, 
+                transparent 100%);
+            animation: wave-flow 10s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes wave-flow {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(33.3333%); }
+        }
+
+        h1, h2 {
+            color: #f3f4f6; /* Blanco violáceo */
+        }
+        
+        /* Estilo de la pregunta: subsecciones resaltadas y texto base limpio */
+        #question-text {
+            line-height: 1.8;
+            font-size: 1.125rem;
+        }
+        /* Esto resalta las letras de las subsecciones (a, b, c) */
+        #question-text strong {
+            color: #d8b4fe; /* Violeta neón */
+            font-weight: 700;
+            margin-right: 0.25rem;
+        }
+
+        .option-btn {
+            background-color: #374151; /* Gris medio-oscuro para botones */
+            border-color: #4b5563;
+            transition: all 0.2s ease-in-out;
+            color: #f3f4f6;
+            text-align: left;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            display: block;
+            border-radius: 8px;
+        }
+        .option-btn:not(:disabled):hover {
+            border-color: #6366f1; /* Azul/Indigo sutil para hover */
+            background-color: #4b5563;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .option-btn.correct {
+            background-color: #15803d; /* Verde para correcto */
+            color: #ecfdf5;
+            border-color: #4ade80; 
+        }
+        .option-btn.incorrect {
+            background-color: #b91c1c; /* Rojo para incorrecto */
+            color: #fef2f2;
+            border-color: #f87171; 
+        }
+        .primary-btn {
+            background-color: #a78bfa; /* Púrpura/Indigo vibrante */
+            color: #0d001a;
+            font-weight: 700;
+            transition: background-color 0.2s;
+        }
+        .primary-btn:hover { 
+            background-color: #c084fc; 
+            transform: scale(1.02); 
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.6);
+        }
+        .tip-box {
+            background-color: #11001a; 
+            border-left: 4px solid #d8b4fe; 
+            padding: 1rem;
+            margin-top: 1rem;
+            color: #f3e8ff;
+            font-family: 'Roboto Mono', monospace;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        .tip-btn {
+            background-color: #374151;
+            color: #a5b4fc;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .tip-btn:hover {
+            background-color: #4b5563;
+            color: white;
+        }
+        .code-block {
+            background-color: #111827;
+            color: #4ade80; /* Verde neón para código */
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-top: 1rem;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+        .fade-out { animation: fadeOut 0.5s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div id="quiz-container" class="w-full max-w-3xl quiz-panel p-6 sm:p-8 rounded-lg shadow-2xl transition-opacity duration-500 my-8">
+        
+        <!-- Animación de Onda en la parte superior -->
+        <div class="wave-container rounded-t-lg">
+            <div class="wave"></div>
+        </div>
+
+        <div id="start-screen" class="text-center">
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-2">Práctica de Ondas 🌌</h1>
+            <div class="border-b border-indigo-500 w-full mb-6 mx-auto max-w-xs"></div>
+            <p class="text-lg text-gray-300 mt-2 mb-6">Evaluación de Longitud de Onda, Frecuencia y Velocidad de Propagación.</p>
+            
+            <p class="text-gray-400 mb-8 text-left">Selecciona un modo de práctica para comenzar.</p>
+            <div class="flex flex-col sm:flex-row gap-4" id="mode-selection-btns">
+                <button id="linear-mode-btn" class="primary-btn w-full font-bold py-3 px-6 rounded-lg text-lg">Modo Lineal</button>
+                <button id="select-mode-btn" class="primary-btn w-full font-bold py-3 px-6 rounded-lg text-lg">Seleccionar Problema</button>
+            </div>
+            <div id="problem-list" class="flex flex-col gap-4 mt-6 hidden"></div>
+        </div>
+
+        <div id="question-screen" class="hidden">
+            <div class="w-full bg-gray-700 h-2 rounded-full mb-4">
+                <div id="progress-bar" class="bg-indigo-500 h-full rounded-full" style="width: 0%; transition: width 0.5s ease-in-out;"></div>
+            </div>
+            <div id="question-content" class="transition-opacity duration-500">
+                <p class="text-sm font-semibold text-indigo-400" id="question-counter"></p>
+                <h2 class="text-xl sm:text-2xl text-white mt-2 font-semibold" id="question-text"></h2>
+                
+                <div id="circuit-image-container" class="my-4 text-center">
+                    <img id="circuit-image" class="inline-block border border-gray-600 rounded-lg" src="" alt="Diagrama del problema" style="max-height: 250px;">
+                </div>
+
+                <div id="hint-trigger-container" class="my-4 text-center">
+                    <button id="show-tip-btn" class="tip-btn text-sm font-medium">Mostrar Tip de Ayuda (Opcional)</button>
+                </div>
+                
+                <div id="hint-box" class="tip-box hidden">
+                    <p class="font-bold text-indigo-300 mb-1">💡 Tip para resolver:</p>
+                    <p id="hint-text"></p>
+                </div>
+
+                <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6"></div>
+
+                <div id="feedback-container" class="hidden p-4 rounded-lg mt-4 text-sm border-l-4">
+                    <p class="font-bold text-lg mb-3 flex items-center" id="feedback-title"></p>
+                    <p class="font-bold text-gray-300 mb-2 text-base">Solución Detallada:</p>
+                    <div id="feedback-explanation"></div>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4 mt-6">
+                <button id="back-btn" class="primary-btn w-full font-bold py-3 px-6 rounded-lg text-lg hidden">Anterior</button>
+                <button id="next-btn" class="primary-btn w-full font-bold py-3 px-6 rounded-lg text-lg hidden">Siguiente</button>
+            </div>
+            <button id="main-menu-btn" class="primary-btn w-full mt-4 font-bold py-3 px-6 rounded-lg text-lg">Menú Principal</button>
+        </div>
+
+        <div id="results-screen" class="hidden text-center">
+            <h2 class="text-3xl font-bold text-white mb-4">¡Práctica Finalizada! 🎉</h2>
+            <p class="text-xl text-gray-400 mb-6">Resultado Final:</p>
+            <div class="bg-gray-700 border-2 border-indigo-500 text-indigo-400 text-5xl font-bold rounded-full w-36 h-36 flex items-center justify-center mx-auto mb-8 shadow-lg" id="score-display">
+            </div>
+            <p id="rank-text" class="text-xl text-indigo-400 font-semibold mb-8"></p>
+            <button id="restart-btn" class="primary-btn w-full font-bold py-3 px-6 rounded-lg text-lg">Reiniciar Práctica</button>
+        </div>
+    </div>
+
+    <script>
+        // Función auxiliar para renderizar LaTeX
+        function renderLatex(element) {
+            if (window.renderMathInElement) {
+                renderMathInElement(element || document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                    ],
+                    throwOnError: false,
+                    trust: true,
+                });
+            } else {
+                console.error("KaTeX auto-render is not available.");
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderLatex(); 
+            renderProblemList();
+        });
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Velocidades y constantes (en m/s o unidades base)
+        const v_sonido_aire = 343; // m/s
+        const v_sonido_cuerpo = 1480; // m/s
+        const c_luz = 3.00e8; // m/s
+
+        const quizData = [
+            {
+                name: "Longitudes de Onda Audibles y Visibles",
+                question: `<strong>1.</strong> (a) Longitudes de onda audibles. El rango de frecuencias audibles es de $20 \\, Hz$ a $20,000 \\, Hz$. ¿Cuál es el rango de las longitudes de onda del sonido audible en el aire? (b) Luz visible. El rango de la luz visible se extiende de $400 \\, nm$ a $700 \\, nm$. ¿Cuál es el rango de frecuencias visibles de la luz? (c) Cirugía cerebral. El ultrasonido quirúrgico tiene una frecuencia de $23 \\, kHz$. ¿Cuál es la longitud de onda de estas ondas en el aire? (d) Sonido en el cuerpo. ¿Cuál sería la longitud de onda del sonido en fluidos corporales si la velocidad del sonido es $1480 \\, m/s$ y la frecuencia no cambia?`,
+                tip: "Usa la relación fundamental de las ondas: $v = f \\lambda$. Recuerda que para el sonido en el aire $v \\approx 343 \\, m/s$ y para la luz $c = 3.00 \\times 10^8 \\, m/s$.",
+                options: [
+                    { text: "a) $1.7 \\, cm$ a $17.2 \\, m$; b) $4.3 \\times 10^{14}$ a $7.5 \\times 10^{14} \\, Hz$", correct: false },
+                    { text: "a) $1.7 \\, cm$ a $17.2 \\, m$; b) $7.5 \\times 10^{14}$ a $4.3 \\times 10^{14} \\, Hz$", correct: true },
+                    { text: "a) $0.017 \\, m$ a $1.72 \\, m$; b) $4.3 \\times 10^{14}$ a $7.5 \\times 10^{14} \\, Hz$", correct: false },
+                    { text: "a) $1.7 \\, m$ a $17.2 \\, m$; b) $4.3 \\times 10^{14}$ a $7.5 \\times 10^{14} \\, Hz$", correct: false }
+                ],
+                solution: {
+                    text: `La relación principal es $v = f \\lambda$, de donde $\\lambda = v/f$ y $f = v/\\lambda$.
+                            <br><br>
+                            <strong>a) Sonido Audible ($v = 343 \\, m/s$):</strong>
+                            - $\\lambda_{min} = \\frac{343 \\, m/s}{20000 \\, Hz} \\approx 0.01715 \\, m \\approx 1.7 \\, cm$.
+                            - $\\lambda_{max} = \\frac{343 \\, m/s}{20 \\, Hz} \\approx 17.15 \\, m \\approx 17.2 \\, m$.
+                            <br><br>
+                            <strong>b) Luz Visible ($v = c = 3.00 \\times 10^8 \\, m/s$):</strong>
+                            - $\\lambda_{rojo} = 700 \\, nm = 7.00 \\times 10^{-7} \\, m$. $f_{min} = \\frac{3.00 \\times 10^8 \\, m/s}{7.00 \\times 10^{-7} \\, m} \\approx 4.29 \\times 10^{14} \\, Hz$.
+                            - $\\lambda_{violeta} = 400 \\, nm = 4.00 \\times 10^{-7} \\, m$. $f_{max} = \\frac{3.00 \\times 10^8 \\, m/s}{4.00 \\times 10^{-7} \\, m} = 7.50 \\times 10^{14} \\, Hz$.
+                            - El rango es de $7.5 \\times 10^{14} \\, Hz$ (violeta) a $4.3 \\times 10^{14} \\, Hz$ (rojo).
+                            <br><br>
+                            La opción correcta para (a) y (b) es **a) $1.7 \\, cm$ a $17.2 \\, m$; b) $7.5 \\times 10^{14}$ a $4.3 \\times 10^{14} \\, Hz$**.`
+                }
+            },
+            {
+                name: "Espectro Electromagnético",
+                question: `<strong>2.</strong> Las ondas electromagnéticas viajan a la velocidad de la luz ($c = 3.00 \\times 10^8 \\, m/s$).
+                            <br>
+                            (a) Radio FM. Encuentre la longitud de onda de una estación de radio FM que transmite a una frecuencia de $104.5 \\, MHz$.
+                            <br>
+                            (b) Rayos X. Los rayos X tienen una longitud de onda de aproximadamente $0.10 \\, nm$. ¿Cuál es su frecuencia?
+                            <br>
+                            (c) Radiación del Big Bang. Se han detectado microondas con una longitud de onda de $1.1 \\, mm$. ¿Cuál es su frecuencia?
+                            <br>
+                            (d) Quemaduras solares. Las quemaduras solares son causadas por luz ultravioleta con una frecuencia de alrededor de $10^{16} \\, Hz$. ¿Cuál es su longitud de onda?
+                            <br>
+                            (e) SETI. Se sugiere buscar señales en $1.43 \\, GHz$. ¿A qué longitud de onda deberían sintonizar nuestros telescopios?
+                            <br>
+                            (f) Microondas de horno. Los hornos de microondas operan a $2.45 \\, GHz$. ¿Qué longitud de onda tienen estas ondas?`,
+                tip: "Usa consistentemente $c = f \\lambda$. Asegúrate de convertir todas las unidades a las unidades base (metros y Hertz) antes de calcular: $1 \\, MHz = 10^6 \\, Hz$, $1 \\, GHz = 10^9 \\, Hz$, $1 \\, nm = 10^{-9} \\, m$, $1 \\, mm = 10^{-3} \\, m$.",
+                options: [
+                    { text: "a) $2.87 \\, m$, b) $3.0 \\times 10^{18} \\, Hz$, c) $2.7 \\times 10^{11} \\, Hz$, d) $30 \\, nm$, e) $21.0 \\, cm$, f) $12.2 \\, cm$", correct: true },
+                    { text: "a) $2.87 \\, m$, b) $3.0 \\times 10^{17} \\, Hz$, c) $2.7 \\times 10^{11} \\, Hz$, d) $3.0 \\times 10^{-9} \\, m$, e) $2.1 \\, m$, f) $12.2 \\, cm$", correct: false },
+                    { text: "a) $2.87 \\, m$, b) $3.0 \\times 10^{18} \\, Hz$, c) $2.7 \\times 10^{11} \\, Hz$, d) $3.0 \\times 10^{7} \\, m$, e) $21.0 \\, cm$, f) $12.2 \\, m$", correct: false },
+                    { text: "a) $287 \\, m$, b) $3.0 \\times 10^{18} \\, Hz$, c) $2.7 \\times 10^{11} \\, Hz$, d) $30 \\, nm$, e) $21.0 \\, cm$, f) $1.22 \\, cm$", correct: false }
+                ],
+                solution: {
+                    text: `La fórmula clave es $\\lambda = c/f$ o $f = c/\\lambda$. Usamos $c = 3.00 \\times 10^8 \\, m/s$.
+                            <br><br>
+                            <strong>a) Radio FM ($f = 104.5 \\, MHz = 1.045 \\times 10^8 \\, Hz$):</strong>
+                            $\\lambda = \\frac{3.00 \\times 10^8}{1.045 \\times 10^8} \\approx 2.87 \\, m$.
+                            <br><br>
+                            La respuesta es la opción que contiene todos estos valores (redondeados).`
+                }
+            },
+            {
+                name: "Onda Sísmica",
+                question: `<strong>3.</strong> Si una onda sísmica tiene una longitud de onda de $13 \\, km$ y hace que el suelo vibre $10.0$ veces por minuto, ¿cuál es la velocidad de la onda?`,
+                tip: "La velocidad de una onda es $v = f \\lambda$. Primero, convierte la frecuencia de vibraciones por minuto a Hertz (vibraciones por segundo). $1 \\, Hz = 1 \\, \\text{vibración}/s$.",
+                options: [
+                    { text: "$2.17 \\, km/s$", correct: true },
+                    { text: "$1.30 \\, km/s$", correct: false },
+                    { text: "$780 \\, m/s$", correct: false },
+                    { text: "$21.7 \\, km/s$", correct: false }
+                ],
+                solution: {
+                    text: `**1. Cálculo de la Frecuencia ($f$):**
+                            $f = \\frac{10.0 \\, \\text{vibraciones}}{1 \\, \\text{min}} \\cdot \\frac{1 \\, \\text{min}}{60 \\, s} \\approx 0.1667 \\, Hz$.
+                            <br><br>
+                            **2. Cálculo de la Velocidad ($v$):**
+                            $v = f \\lambda = (0.1667 \\, Hz)(13 \\, km) \\approx 2.167 \\, km/s$.
+                            <br>
+                            La respuesta es **$2.17 \\, km/s$** (redondeado).`
+                }
+            },
+            {
+                name: "Bote sobre Olas",
+                question: `<strong>4.</strong> Un pescador nota que su bote se mueve hacia arriba y hacia abajo periódicamente debido a las olas en la superficie del agua. Tarda $2.5 \\, s$ para que el bote viaje desde su punto más alto hasta el más bajo, una distancia total de $0.62 \\, m$. El pescador ve que las crestas de las olas están espaciadas $6.0 \\, m$ entre sí. (a) ¿Qué tan rápido viajan las olas? (b) ¿Cuál es la amplitud de cada onda? (c) Si la distancia vertical total recorrida por el bote fuera $0.30 \\, m$, pero los otros datos se mantuvieran iguales, ¿cómo se verían afectadas las respuestas de las partes (a) y (b)?`,
+                tip: "(a) El tiempo de pico a valle es la mitad del período ($T/2$). La velocidad es $v = \\lambda / T$. (b) La distancia total de pico a valle es $2A$. (c) Solo la amplitud ($A$) cambiaría.",
+                options: [
+                    { text: "a) $1.2 \\, m/s$, b) $0.31 \\, m$, c) $A$ se reduce a $0.15 \\, m$, $v$ no cambia", correct: true },
+                    { text: "a) $2.4 \\, m/s$, b) $0.62 \\, m$, c) $A$ se mantiene igual, $v$ se reduce a la mitad", correct: false },
+                    { text: "a) $0.6 \\, m/s$, b) $0.15 \\, m$, c) Ambas $A$ y $v$ se reducen a la mitad", correct: false },
+                    { text: "a) $1.5 \\, m/s$, b) $0.31 \\, m$, c) $A$ se reduce a $0.15 \\, m$, $v$ se reduce a $0.75 \\, m/s$", correct: false }
+                ],
+                solution: {
+                    text: `**Datos:** $\\lambda = 6.0 \\, m$. Tiempo de pico a valle ($T/2$) $= 2.5 \\, s$. Distancia vertical total $= 0.62 \\, m$.
+                            <br><br>
+                            <strong>(a) Velocidad de las Ondas ($v$):</strong>
+                            Período: $T = 2 \\times 2.5 \\, s = 5.0 \\, s$.
+                            $v = \\frac{\\lambda}{T} = \\frac{6.0 \\, m}{5.0 \\, s} = 1.2 \\, m/s$.
+                            <br><br>
+                            <strong>(b) Amplitud ($A$):</strong>
+                            La distancia de pico a valle es $2A$.
+                            $A = \\frac{\\text{Distancia vertical total}}{2} = \\frac{0.62 \\, m}{2} = 0.31 \\, m$.
+                            <br><br>
+                            <strong>(c) Efecto de la Distancia Vertical:</strong>
+                            Si la distancia vertical es $0.30 \\, m$, la amplitud cambia, pero el período y la longitud de onda (que definen $v$) siguen siendo los mismos.
+                            - $A_{nueva} = \\frac{0.30 \\, m}{2} = 0.15 \\, m$.
+                            - La velocidad ($v$) sigue siendo **$1.2 \\, m/s$**.
+                            <br>
+                            La respuesta es **a) $1.2 \\, m/s$, b) $0.31 \\, m$, c) $A$ se reduce a $0.15 \\, m$, $v$ no cambia**.`
+                }
+            },
+            {
+                name: "Descripción Matemática de Onda I",
+                question: `<strong>5.</strong> Una onda transversal está descrita por la ecuación $y(x, t) = (6.50 \\, mm) \\sin\\left(2\\pi \\left(\\frac{t}{0.0360 \\, s} - \\frac{x}{0.280 \\, m}\\right)\\right)$.
+                             <br>
+                             Determine la onda: (a) amplitud, (b) longitud de onda, (c) frecuencia, (d) velocidad de propagación, y (e) dirección de propagación.`,
+                tip: "Compara la ecuación dada con la forma estándar: $y(x,t) = A \\sin\\left(2\\pi \\left(\\frac{t}{T} - \\frac{x}{\\lambda}\\right)\\right)$. Recuerda que $f = 1/T$ y $v = f\\lambda$.",
+                options: [
+                    { text: "a) $6.5 \\, mm$, b) $0.28 \\, m$, c) $27.8 \\, Hz$, d) $7.78 \\, m/s$, e) Dirección $+x$", correct: true },
+                    { text: "a) $6.5 \\, m$, b) $0.036 \\, m$, c) $27.8 \\, Hz$, d) $0.28 \\, m/s$, e) Dirección $-x$", correct: false },
+                    { text: "a) $6.5 \\, mm$, b) $0.28 \\, m$, c) $0.036 \\, Hz$, d) $12.9 \\, m/s$, e) Dirección $+x$", correct: false },
+                    { text: "a) $6.5 \\, mm$, b) $0.036 \\, m$, c) $27.8 \\, Hz$, d) $7.78 \\, m/s$, e) Dirección $-x$", correct: false }
+                ],
+                solution: {
+                    text: `La ecuación dada es $y(x, t) = (6.50 \\, mm) \\sin\\left(2\\pi \\left(\\frac{t}{0.0360 \\, s} - \\frac{x}{0.280 \\, m}\\right)\\right)$.
+                            <br>
+                            Comparando con la forma estándar $y(x,t) = A \\sin\\left(2\\pi \\left(\\frac{t}{T} - \\frac{x}{\\lambda}\\right)\\right)$:
+                            <br><br>
+                            <strong>(a) Amplitud ($A$):</strong> $A = 6.50 \\, mm$.
+                            <br><br>
+                            <strong>(b) Longitud de Onda ($\\lambda$):</strong> $\\lambda = 0.280 \\, m$.
+                            <br><br>
+                            <strong>(c) Frecuencia ($f$):</strong> El período es $T = 0.0360 \\, s$. $f = 1/T = 1 / 0.0360 \\, s \\approx 27.78 \\, Hz$.
+                            <br><br>
+                            <strong>(d) Velocidad de Propagación ($v$):</strong> $v = f \\lambda = (27.78 \\, Hz)(0.280 \\, m) \\approx 7.778 \\, m/s$.
+                            <br><br>
+                            <strong>(e) Dirección:</strong> El signo negativo entre los términos $t$ y $x$ indica que la onda se propaga en la **dirección $+x$**.
+                            <br><br>
+                            La respuesta es **a) $6.5 \\, mm$, b) $0.28 \\, m$, c) $27.8 \\, Hz$, d) $7.78 \\, m/s$, e) Dirección $+x$**.`
+                }
+            },
+            {
+                name: "Descripción Matemática de Onda II",
+                // *** CORRECCIÓN AQUÍ ***
+                question: `<strong>6.</strong> Ondas transversales en una cuerda tienen una velocidad de $8.00 \\, m/s$, amplitud $0.0700 \\, m$ y longitud de onda $0.320 \\, m$. Estas ondas viajan en la dirección $+x$, y en $t=0$ el extremo $x=0$ de la cuerda está en su desplazamiento máximo negativo ($y = -0.0700 \\, m$).
+                             <br>
+                             (a) Encuentre la frecuencia, período y número de onda de estas ondas.
+                             (b) Escriba la ecuación para $y(x,t)$ que describe estas ondas.
+                             (c) Encuentre el desplazamiento transversal de un punto en la cuerda en $x = 0.360 \\, m$ en el tiempo $t = 0.150 \\, s$.`,
+                tip: "Usa las relaciones: $f = v/\\lambda$, $T = 1/f$, $k = 2\\pi/\\lambda$, y $\\omega = 2\\pi f$. La ecuación es $y(x,t) = A \\sin(kx - \\omega t + \\phi)$. Usa la condición inicial para encontrar la fase ($\\phi$).",
+                options: [
+                    // Esta opción ahora es coherente con el enunciado modificado.
+                    { text: "a) $25 \\, Hz, 0.040 \\, s, 19.6 \\, m^{-1}$; b) $y(x,t) = 0.07\\sin(19.6x - 157t - \\pi/2)$; c) $-0.022 \\, m$", correct: true },
+                    { text: "a) $25 \\, Hz, 0.040 \\, s, 19.6 \\, m^{-1}$; b) $y(x,t) = 0.07\\sin(19.6x - 157t)$; c) $0.065 \\, m$", correct: false },
+                    { text: "a) $0.040 \\, s, 25 \\, Hz, 19.6 \\, m^{-1}$; b) $y(x,t) = 0.07\\sin(19.6x + 157t)$; c) $-0.070 \\, m$", correct: false },
+                    { text: "a) $25 \\, Hz, 0.040 \\, s, 19.6 \\, m^{-1}$; b) $y(x,t) = 0.07\\sin(157t - 19.6x + \\pi/2)$; c) $0.022 \\, m$", correct: false }
+                ],
+                // *** CORRECCIÓN AQUÍ ***
+                solution: {
+                    text: `**Datos:** $v = 8.00 \\, m/s$, $A = 0.0700 \\, m$, $\\lambda = 0.320 \\, m$. Dirección $+x$.
+                            <br><br>
+                            <strong>(a) Frecuencia ($f$), Período ($T$), Número de Onda ($k$):</strong>
+                            $f = v/\\lambda = 8.00 / 0.320 = 25.0 \\, Hz$.
+                            $T = 1/f = 1 / 25.0 \\, s = 0.040 \\, s$.
+                            $k = 2\\pi/\\lambda = 2\\pi / 0.320 \\approx 19.63 \\, m^{-1}$.
+                            <br><br>
+                            <strong>(b) Ecuación ($y(x,t)$):</strong>
+                            La forma general para $+x$ es $y(x,t) = A \\sin(kx - \\omega t + \\phi)$. $\\omega = 2\\pi f = 2\\pi(25.0) \\approx 157 \\, \\text{rad}/s$.
+                            <br>
+                            Usando la condición inicial ($t=0, x=0, y=-A$):
+                            $y(0,0) = A \\sin(0 - 0 + \\phi) = -A$
+                            $\\sin(\\phi) = -1 \\implies \\phi = -\\pi/2$.
+                            <br>
+                            $y(x,t) = 0.0700 \\sin(19.6x - 157t - \\pi/2)$.
+                            <br><br>
+                            <strong>(c) Desplazamiento Transversal:</strong>
+                            En $x=0.360 \\, m$ y $t=0.150 \\, s$:
+                            Argumento $= kx - \\omega t - \\pi/2$
+                            Argumento $\\approx (19.63)(0.360) - (157.1)(0.150) - 1.571$
+                            Argumento $\\approx 7.067 - 23.565 - 1.571 \\approx -18.069 \\, \\text{rad}$.
+                            <br>
+                            $y = 0.0700 \\sin(-18.069) \\approx 0.0700 \\cdot (-0.313) \\approx -0.022 \\, m$.
+                            <br>
+                            La respuesta es **a) $25 \\, Hz, 0.040 \\, s, 19.6 \\, m^{-1}$; b) $y(x,t) = 0.07\\sin(19.6x - 157t - \\pi/2)$; c) $-0.022 \\, m$**.`
+                }
+            },
+            {
+                name: "Descripción Matemática de Onda III",
+                question: `<strong>7.</strong> La ecuación que describe una onda transversal en una cuerda es $y(x, t) = (1.50 \\, mm) \\sin\\left[(157 \\, \\text{s}^{-1})t - (41.9 \\, \\text{m}^{-1})x\\right]$.
+                             <br>
+                             (a) Encuentre la longitud de onda, frecuencia y amplitud de esta onda, (b) la velocidad y dirección de movimiento de la onda, y (c) el desplazamiento transversal de un punto en la cuerda cuando $t = 0.100 \\, s$ y en una posición $x = 0.135 \\, m$.`,
+                tip: "Compara con la forma estándar $y(x,t) = A \\sin(\\omega t - kx)$. $\\omega$ es el coeficiente de $t$, $k$ es el coeficiente de $x$. $v = \\omega / k$.",
+                options: [
+                    { text: "a) $\\lambda=0.15 \\, m$, $f=25.0 \\, Hz$, $A=1.5 \\, mm$; b) $3.75 \\, m/s$ en $+x$; c) $-1.29 \\, mm$", correct: true },
+                    { text: "a) $\\lambda=0.075 \\, m$, $f=157 \\, Hz$, $A=1.5 \\, mm$; b) $3.75 \\, m/s$ en $-x$; c) $1.29 \\, mm$", correct: false },
+                    { text: "a) $\\lambda=0.15 \\, m$, $f=41.9 \\, Hz$, $A=1.5 \\, mm$; b) $3.75 \\, m/s$ en $+x$; c) $-1.5 \\, mm$", correct: false },
+                    { text: "a) $\\lambda=0.15 \\, m$, $f=25.0 \\, Hz$, $A=1.5 \\, mm$; b) $6.68 \\, m/s$ en $+x$; c) $1.29 \\, mm$", correct: false }
+                ],
+                solution: {
+                    text: `La ecuación dada es $y(x, t) = (1.50 \\, mm) \\sin\\left[(157 \\, \\text{s}^{-1})t - (41.9 \\, \\text{m}^{-1})x\\right]$.
+                            <br>
+                            Comparando con la forma estándar $y(x,t) = A \\sin(\\omega t - kx)$:
+                            <br><br>
+                            <strong>(a) Amplitud, Longitud de Onda y Frecuencia:</strong>
+                            $A = 1.50 \\, mm$.
+                            $\\omega = 157 \\, \\text{rad}/s$. $f = \\frac{\\omega}{2\\pi} = \\frac{157}{2\\pi} \\approx 25.0 \\, Hz$.
+                            $k = 41.9 \\, \\text{m}^{-1}$. $\\lambda = \\frac{2\\pi}{k} = \\frac{2\\pi}{41.9} \\approx 0.150 \\, m$.
+                            <br><br>
+                            <strong>(b) Velocidad y Dirección:</strong>
+                            $v = \\frac{\\omega}{k} = \\frac{157 \\, \\text{s}^{-1}}{41.9 \\, \\text{m}^{-1}} \\approx 3.747 \\, m/s$.
+                            El signo negativo entre $\\omega t$ y $kx$ indica la **dirección $+x$**.
+                            <br><br>
+                            <strong>(c) Desplazamiento Transversal:</strong>
+                            Sustituir $t = 0.100 \\, s$ y $x = 0.135 \\, m$ en la ecuación:
+                            Argumento $= (157)(0.100) - (41.9)(0.135) = 15.7 - 5.6565 = 10.0435 \\, \\text{rad}$.
+                            $y = (1.50 \\, mm) \\sin(10.0435 \\, \\text{rad}) \\approx 1.50 \\, mm \\cdot (-0.860) \\approx -1.29 \\, mm$.
+                            <br>
+                            La respuesta es **a) $\\lambda=0.15 \\, m$, $f=25.0 \\, Hz$, $A=1.5 \\, mm$; b) $3.75 \\, m/s$ en $+x$; c) $-1.29 \\, mm$**.`
+                }
+            },
+            {
+                name: "Velocidad y Aceleración Transversal",
+                question: `<strong>8.</strong> Una onda transversal en una cuerda se describe mediante la ecuación:
+                             $$y(x, t) = (0.015 \\, m) \\sin\\left[(5.0 \\, m^{-1})x - (12.0 \\, s^{-1})t\\right]$$
+                             (a) Encuentre la velocidad transversal ($v_y$) y la aceleración transversal ($a_y$) de una partícula en la posición $x = 0.20 \\, m$ y el tiempo $t = 0.15 \\, s$.
+                             <br>
+                             (b) ¿Cuál es la magnitud de la máxima velocidad transversal ($v_{y, max}$) y la máxima aceleración transversal ($a_{y, max}$) para cualquier partícula en la cuerda?`,
+                tip: "Usa derivadas parciales:<br> $v_y = \\frac{\\partial y}{\\partial t} = -A\\omega \\cos(kx - \\omega t)$.<br> $a_y = \\frac{\\partial v_y}{\\partial t} = -A\\omega^2 \\sin(kx - \\omega t)$.<br> La magnitud máxima de $v_y$ es $A\\omega$ y de $a_y$ es $A\\omega^2$.",
+                options: [
+                    { text: "a) $v_y = -0.13 \\, m/s$, $a_y = 1.55 \\, m/s^2$; b) $v_{y, max}=0.18 \\, m/s$, $a_{y, max}=2.16 \\, m/s^2$", correct: true },
+                    { text: "a) $v_y = 0.12 \\, m/s$, $a_y = 2.16 \\, m/s^2$; b) $v_{y, max}=0.075 \\, m/s$, $a_{y, max}=0.90 \\, m/s^2$", correct: false },
+                    { text: "a) $v_y = 0.015 \\, m/s$, $a_y = -1.08 \\, m/s^2$; b) $v_{y, max}=0.18 \\, m/s$, $a_{y, max}=2.16 \\, m/s^2$", correct: false },
+                    { text: "a) $v_y = -0.18 \\, m/s$, $a_y = 1.08 \\, m/s^2$; b) $v_{y, max}=0.18 \\, m/s$, $a_{y, max}=2.16 \\, m/s^2$", correct: false }
+                ],
+                solution: {
+                    text: `La ecuación de onda es $y(x, t) = A \\sin(kx - \\omega t)$, donde $A = 0.015 \\, m$, $k = 5.0 \\, \\text{m}^{-1}$, y $\\omega = 12.0 \\, \\text{s}^{-1}$.
+                            <br><br>
+                            <strong>Ecuaciones de Derivada:</strong>
+                            $v_y = \\frac{\\partial y}{\\partial t} = -A\\omega \\cos(kx - \\omega t)$
+                            $a_y = \\frac{\\partial v_y}{\\partial t} = -A\\omega^2 \\sin(kx - \\omega t)$
+                            <br><br>
+                            <strong>(a) Evaluación en $x=0.20 \\, m, t=0.15 \\, s$:</strong>
+                            Argumento $= kx - \\omega t = (5.0)(0.20) - (12.0)(0.15) = 1.0 - 1.8 = -0.80 \\, \\text{rad}$.
+                            <br>
+                            **Velocidad Transversal ($v_y$):**
+                            $v_y = -(0.015)(12.0) \\cos(-0.80) \\, m/s$
+                            $v_y \\approx -0.18 \\, \\text{m/s} \\cdot 0.6967 \\approx -0.125 \\, m/s$.
+                            <br>
+                            **Aceleración Transversal ($a_y$):**
+                            $a_y = -(0.015)(12.0)^2 \\sin(-0.80) \\, m/s^2$
+                            $a_y \\approx -2.16 \\cdot (-0.7174) \\approx 1.55 \\, m/s^2$.
+                            <br>
+                            (Redondeando a dos decimales, los valores son $v_y \\approx -0.13 \\, m/s$ y $a_y \\approx 1.55 \\, m/s^2$)
+                            <br><br>
+                            <strong>(b) Máximos:</strong>
+                            $v_{y, max} = A\\omega = (0.015 \\, m)(12.0 \\, \\text{s}^{-1}) = 0.18 \\, m/s$.
+                            $a_{y, max} = A\\omega^2 = (0.015 \\, m)(12.0 \\, \\text{s}^{-1})^2 = 2.16 \\, m/s^2$.
+                            <br>
+                            La respuesta correcta es la opción que contiene los valores calculados: **a) $v_y = -0.13 \\, m/s$, $a_y = 1.55 \\, m/s^2$; b) $v_{y, max}=0.18 \\, m/s$, $a_{y, max}=2.16 \\, m/s^2$**.`
+                }
+            },
+            {
+                name: "Aceleración y Velocidad Máximas",
+                question: `<strong>9.</strong> Una onda armónica simple está dada por $y(x, t) = (0.0050 \\, m) \\sin(5.0x - 100t)$.
+                             <br>
+                             (a) ¿Cuál es la velocidad transversal de una partícula en $x = 0.50 \\, m$ en $t = 0.10 \\, s$?
+                             (b) ¿Cuál es la magnitud de la máxima velocidad transversal ($v_{y, max}$) y la máxima aceleración transversal ($a_{y, max}$) para cualquier partícula en la cuerda?`,
+                tip: "Usa derivadas parciales: $v_y = \\frac{\\partial y}{\\partial t}$ y $a_y = \\frac{\\partial v_y}{\\partial t}$. Recuerda que la derivada de $\\sin(u)$ es $\\cos(u) \\frac{\partial u}{\\partial t}$.",
+                options: [
+                    { text: "a) $-0.17 \\, m/s$; b) $v_{y, max}=0.50 \\, m/s$, $a_{y, max}=50 \\, m/s^2$", correct: true },
+                    { text: "a) $0.43 \\, m/s$; b) $v_{y, max}=5.0 \\, m/s$, $a_{y, max}=500 \\, m/s^2$", correct: false },
+                    { text: "a) $-0.50 \\, m/s$; b) $v_{y, max}=0.50 \\, m/s$, $a_{y, max}=50 \\, m/s^2$", correct: false },
+                    { text: "a) $0.17 \\, m/s$; b) $v_{y, max}=0.50 \\, m/s$, $a_{y, max}=5.0 \\, m/s^2$", correct: false }
+                ],
+                solution: {
+                    text: `La ecuación es $y(x, t) = A \\sin(kx - \\omega t)$, donde $A = 0.0050 \\, m$, $k = 5.0 \\, \\text{m}^{-1}$, y $\\omega = 100 \\, \\text{s}^{-1}$.
+                            <br><br>
+                            <strong>(a) Velocidad Transversal ($v_y$):</strong>
+                            $v_y = \\frac{\\partial y}{\\partial t} = (0.0050) \\cos(5.0x - 100t) \cdot (-100) = -0.50 \\cos(kx - \\omega t)$
+                            <br>
+                            En $x=0.50 \\, m, t=0.10 \\, s$:
+                            Argumento $= (5.0)(0.50) - (100)(0.10) = 2.5 - 10.0 = -7.5 \\, \\text{rad}$.
+                            $v_y = -0.50 \\, \\text{m/s} \\cdot \\cos(-7.5 \\, \\text{rad})$.
+                            $v_y \\approx -0.50 \\cdot (0.342) \\approx -0.171 \\, m/s$. 
+                            <br><br>
+                            <strong>(b) Máximos:</strong>
+                            La velocidad $v_y$ es $v_y = -A\\omega \\cos(kx - \\omega t)$. El valor máximo de $\\cos$ es 1.
+                            $v_{y, max} = A\\omega = (0.0050 \\, m)(100 \\, \\text{s}^{-1}) = 0.50 \\, m/s$.
+                            <br>
+                            $a_y = \\frac{\\partial v_y}{\partial t} = -(-0.50) \sin(kx - \\omega t) \cdot (-100) = -A\\omega^2 \\sin(kx - \\omega t)$.
+                            $a_{y, max} = A\\omega^2 = (0.0050 \\, m)(100 \\, \\text{s}^{-1})^2 = 50.0 \\, m/s^2$.
+                            <br>
+                            La respuesta correcta es **a) $-0.17 \\, m/s$; b) $v_{y, max}=0.50 \\, m/s$, $a_{y, max}=50 \\, m/s^2$**.`
+                }
+            },
+            {
+                name: "Ondas Transversales y Tensión",
+                question: `<strong>10.</strong> Ondas transversales viajan en una cuerda larga que está bajo una tensión de $4.00 \\, N$. La ecuación que describe estas ondas es $y(x,t) = (1.25 \\, cm) \\sin\\left[(415 \\, \\text{s}^{-1})t - (44.9 \\, \\text{m}^{-1})x\\right]$.
+                             <br>
+                             (a) Encuentre la velocidad de la onda, y (b) la longitud de onda y la frecuencia.`,
+                tip: "Usa los parámetros de la ecuación de onda para hallar $v = \\omega/k$, $\\lambda=2\\pi/k$, y $f=\\omega/(2\\pi)$.",
+                options: [
+                    { text: "a) $9.24 \\, m/s$; b) $\\lambda=0.14 \\, m, f=66.0 \\, Hz$", correct: true },
+                    { text: "a) $9.24 \\, m/s$; b) $\\lambda=0.045 \\, m, f=44.9 \\, Hz$", correct: false },
+                    { text: "a) $15.0 \\, m/s$; b) $\\lambda=0.14 \\, m, f=66.0 \\, Hz$", correct: false },
+                    { text: "a) $44.9 \\, m/s$; b) $\\lambda=0.14 \\, m, f=66.0 \\, Hz$", correct: false }
+                ],
+                solution: {
+                    text: `La ecuación es $y(x,t) = (1.25 \\, cm) \\sin(\\omega t - kx)$, con $\\omega = 415 \\, \\text{rad}/s$ y $k = 44.9 \\, \\text{m}^{-1}$.
+                            <br><br>
+                            <strong>(a) Velocidad de la Onda ($v$):</strong>
+                            $v = \\frac{\\omega}{k} = \\frac{415 \\, \\text{s}^{-1}}{44.9 \\, \\text{m}^{-1}} \\approx 9.243 \\, m/s$.
+                            <br><br>
+                            <strong>(b) Longitud de Onda ($\\lambda$) y Frecuencia ($f$):</strong>
+                            $\\lambda = \\frac{2\\pi}{k} = \\frac{2\\pi}{44.9 \\, \\text{m}^{-1}} \\approx 0.140 \\, m$.
+                            $f = \\frac{\\omega}{2\\pi} = \\frac{415 \\, \\text{s}^{-1}}{2\\pi} \\approx 66.05 \\, Hz$.
+                            <br><br>
+                            La respuesta es **a) $9.24 \\, m/s$; b) $\\lambda=0.14 \\, m, f=66.0 \\, Hz$** (redondeado).`
+                }
+            },
+            {
+                name: "Interpretación de Gráfica de Onda (y vs x)",
+                question: `<strong>11.</strong> La siguiente gráfica muestra una instantánea de una onda transversal en una cuerda en $t=0$. La onda viaja en la dirección $+x$ con una velocidad de $2.0 \, m/s$. <br> (a) ¿Cuál es la amplitud y la longitud de onda? (b) ¿Cuál es la frecuencia y el número de onda? (c) Escriba la ecuación $y(x,t)$ para esta onda.`,
+                image_url: "https://i.imgur.com/RJbneHz.png",
+                tip: "La amplitud ($A$) y la longitud de onda ($\\lambda$) se leen directamente de la gráfica $y$ vs $x$. Usa $v = f\\lambda$ para encontrar $f$, y $k = 2\\pi/\\lambda$ para $k$.",
+                options: [
+                    { text: "a) $A=0.5m, \\lambda=4m$; b) $f=0.5Hz, k=1.57 m^{-1}$; c) $y(x,t) = 0.5\\sin(1.57x - 3.14t)$", correct: true },
+                    { text: "a) $A=1.0m, \\lambda=4m$; b) $f=0.5Hz, k=1.57 m^{-1}$; c) $y(x,t) = 1.0\\sin(1.57x - 3.14t)$", correct: false },
+                    { text: "a) $A=0.5m, \\lambda=2m$; b) $f=1.0Hz, k=3.14 m^{-1}$; c) $y(x,t) = 0.5\\sin(3.14x - 6.28t)$", correct: false },
+                    { text: "a) $A=0.5m, \\lambda=4m$; b) $f=0.5Hz, k=1.57 m^{-1}$; c) $y(x,t) = 0.5\\sin(1.57x + 3.14t)$", correct: false }
+                ],
+                solution: {
+                    text: `<strong>(a) Amplitud y Longitud de Onda:</strong> De la gráfica $y(m)$ vs $x(m)$, la altura máxima es la amplitud $A=0.5 \, m$. La distancia para un ciclo completo es la longitud de onda $\\lambda=4.0 \, m$.
+                            <br><br>
+                            <strong>(b) Frecuencia y Número de Onda:</strong>
+                            Frecuencia: $f = v / \\lambda = 2.0 \, m/s / 4.0 \, m = 0.5 \, Hz$.
+                            Número de onda: $k = 2\\pi / \\lambda = 2\\pi / 4.0 = \\pi/2 \\approx 1.57 \, m^{-1}$.
+                            <br><br>
+                            <strong>(c) Ecuación:</strong>
+                            Frecuencia angular: $\\omega = 2\\pi f = 2\\pi(0.5) = \\pi \\approx 3.14 \, rad/s$.
+                            La forma es $y(x,t) = A \\sin(kx - \\omega t + \\phi)$. El signo es '-' porque viaja en la dirección $+x$.
+                            En $t=0, x=0$, la gráfica muestra $y=0$ y la pendiente es positiva (moviéndose hacia arriba), lo que corresponde a una fase $\\phi=0$.
+                            <br>
+                            Ecuación: $y(x,t) = 0.5\\sin(1.57x - 3.14t)$.`
+                }
+            },
+            {
+                name: "Interpretación de Gráfica de Oscilación (y vs t)",
+                question: `<strong>12.</strong> La siguiente gráfica muestra el desplazamiento vertical $y$ de un punto en $x=0$ en una cuerda, como función del tiempo $t$. La onda tiene una longitud de onda $\\lambda = 1.0 \, m$ y viaja en la dirección $-x$. <br> (a) ¿Cuál es la amplitud y el período? (b) ¿Cuál es la frecuencia angular y la velocidad de la onda? (c) Escriba la ecuación $y(x,t)$ para esta onda.`,
+                image_url: "https://i.imgur.com/PPi2hwT.png",
+                tip: "La amplitud ($A$) y el período ($T$) se leen directamente de la gráfica $y$ vs $t$. Usa $\\omega = 2\\pi/T$ y $v = \\lambda / T$. La dirección $-x$ usa un signo '+' en la ecuación.",
+                options: [
+                    { text: "a) $A=0.2m, T=0.4s$; b) $\\omega=15.7 rad/s, v=2.5 m/s$; c) $y(x,t) = 0.2\\sin(6.28x + 15.7t)$", correct: true },
+                    { text: "a) $A=0.4m, T=0.4s$; b) $\\omega=15.7 rad/s, v=2.5 m/s$; c) $y(x,t) = 0.4\\sin(6.28x + 15.7t)$", correct: false },
+                    { text: "a) $A=0.2m, T=0.8s$; b) $\\omega=7.85 rad/s, v=1.25 m/s$; c) $y(x,t) = 0.2\\sin(3.14x + 7.85t)$", correct: false },
+                    { text: "a) $A=0.2m, T=0.4s$; b) $\\omega=15.7 rad/s, v=2.5 m/s$; c) $y(x,t) = 0.2\\sin(6.28x - 15.7t)$", correct: false }
+                ],
+                solution: {
+                    text: `<strong>(a) Amplitud y Período:</strong> De la gráfica $y(m)$ vs $t(s)$, la altura máxima es la amplitud $A=0.2 \, m$. El tiempo para un ciclo completo es el período $T=0.4 \, s$.
+                            <br><br>
+                            <strong>(b) Frecuencia Angular y Velocidad:</strong>
+                            Frecuencia angular: $\\omega = 2\\pi / T = 2\\pi / 0.4 = 5\\pi \\approx 15.7 \, rad/s$.
+                            Velocidad de la onda: $v = \\lambda / T = 1.0 \, m / 0.4 \, s = 2.5 \, m/s$.
+                            <br><br>
+                            <strong>(c) Ecuación:</strong>
+                            Número de onda: $k = 2\\pi / \\lambda = 2\\pi / 1.0 = 2\\pi \\approx 6.28 \, m^{-1}$.
+                            La forma es $y(x,t) = A \\sin(kx + \\omega t + \\phi)$. El signo es '+' porque viaja en la dirección $-x$.
+                            En $t=0, x=0$, la gráfica muestra $y=0$ y la pendiente es positiva (moviéndose hacia arriba), lo que corresponde a una fase $\\phi=0$.
+                            <br>
+                            Ecuación: $y(x,t) = 0.2\\sin(6.28x + 15.7t)$.`
+                }
+            },
+            {
+                name: "Integración de Velocidad Transversal",
+                question: `<strong>13.</strong> La velocidad transversal $v_y$ de una onda en una cuerda está dada por la ecuación:
+                            $$v_y(x, t) = (-0.50 \, m/s) \\cos(x - 5t)$$
+                            Donde $x$ está en metros y $t$ en segundos. Se sabe que la condición inicial en el origen es $y(0, 0) = 0$.
+                            <br>
+                            (a) Determine la ecuación de la posición (desplazamiento transversal) $y(x,t)$.
+                            (b) Calcule la posición $y$ de la partícula en $x = 1.0 \, m$ y $t = 0.5 \, s$.`,
+                tip: "La posición $y(x,t)$ es la integral de la velocidad $v_y(x,t)$ con respecto al tiempo. $y = \\int v_y \, dt$. Usa la condición $y(0,0)=0$ para encontrar la constante de integración.",
+                options: [
+                    { text: "a) $y(x,t) = 0.1\\sin(x - 5t)$; b) $-0.10 \, m$", correct: true },
+                    { text: "a) $y(x,t) = -0.5\\sin(x - 5t)$; b) $-0.50 \, m$", correct: false },
+                    { text: "a) $y(x,t) = -0.1\\cos(x - 5t)$; b) $0.054 \, m$", correct: false },
+                    { text: "a) $y(x,t) = 0.1\\cos(x - 5t) - 0.1$; b) $0.054 \, m$", correct: false }
+                ],
+                solution: {
+                    text: `<strong>(a) Ecuación de Posición $y(x,t)$:</strong>
+                            Debemos integrar $v_y$ con respecto al tiempo $t$ para encontrar $y(x,t)$.
+                            $$y(x,t) = \\int v_y(x, t) \, dt = \\int (-0.50) \\cos(x - 5t) \, dt$$
+                            Usando la sustitución $u = x - 5t$, tenemos $du = -5 \, dt$, por lo que $dt = du / (-5)$.
+                            $$y(x,t) = (-0.50) \\int \\cos(u) \\left(\\frac{du}{-5}\\right)$$
+                            $$y(x,t) = \\left(\\frac{-0.50}{-5}\\right) \\int \\cos(u) \, du = 0.10 \\sin(u) + C$$
+                            Sustituyendo $u$ de nuevo:
+                            $$y(x,t) = 0.10 \\sin(x - 5t) + C$$
+                            Ahora, usamos la condición inicial $y(0, 0) = 0$:
+                            $$0 = 0.10 \\sin(0 - 0) + C \\implies 0 = 0 + C \\implies C = 0$$
+                            La ecuación final es:
+                            <strong>$y(x,t) = 0.10 \\sin(x - 5t)$</strong>
+                            <br><br>
+                            <strong>(b) Posición en $x=1.0, t=0.5$:</strong>
+                            Sustituimos los valores en la ecuación de posición:
+                            $$y(1.0, 0.5) = 0.10 \\sin(1.0 - 5(0.5))$$
+                            $$y(1.0, 0.5) = 0.10 \\sin(1.0 - 2.5) = 0.10 \\sin(-1.5 \, \\text{rad})$$
+                            (Asegúrate de que la calculadora esté en radianes)
+                            $$y(1.0, 0.5) \\approx 0.10 (-0.9975) \\approx -0.09975 \, m$$
+                            Redondeando: <strong>$-0.10 \, m$</strong>.`
+                }
+            },
+            {
+                name: "Onda Amortiguada y Derivación",
+                question: `<strong>14.</strong> Una onda transversal amortiguada en una cuerda se describe por la ecuación de posición:
+                            $$y(x, t) = (0.05 \, m) e^{-0.5t} \\sin(2.0x - 20.0t)$$
+                            Donde $x$ está en metros y $t$ en segundos.
+                            <br>
+                            (a) Encuentre la expresión para la velocidad transversal ($v_y$).
+                            (b) Calcule la velocidad transversal $v_y$ en $x = 1.0 \, m$ y $t = 0.5 \, s$.`,
+                tip: "Usa la <strong>regla del producto</strong> para derivar $y$ con respecto a $t$: $\\frac{d}{dt}(uv) = u'v + uv'$. Aquí, $u = 0.05 e^{-0.5t}$ y $v = \\sin(2x - 20t)$. No olvides la regla de la cadena.",
+                options: [
+                    { text: "a) $v_y = -e^{-0.5t}[0.025\\sin(...) + 1.0\\cos(...)]$; b) $+0.13 \, m/s$", correct: true },
+                    { text: "a) $v_y = -1.0e^{-0.5t}\\cos(...)$ (Olvidó regla de producto); b) $+0.11 \, m/s$", correct: false },
+                    { text: "a) $v_y = e^{-0.5t}[0.05\\sin(...) - 1.0\\cos(...)]$ (Error en derivada de $e$); b) $+0.15 \, m/s$", correct: false },
+                    { text: "a) $v_y = -e^{-0.5t}[...]$; b) $-0.13 \, m/s$ (Error de signo)", correct: false }
+                ],
+                solution: {
+                    text: `<strong>(a) Expresión de $v_y$:</strong>
+                            La velocidad es la derivada de la posición con respecto al tiempo:
+                            $$v_y = \\frac{\\partial y}{\\partial t} = \\frac{\\partial}{\\partial t} \\left[ (0.05 e^{-0.5t}) \\cdot \\sin(2x - 20t) \\right]$$
+                            Usamos la regla del producto ($u'v + uv'$):
+                            <br>
+                            $u = 0.05 e^{-0.5t} \\implies u' = 0.05 \\cdot (-0.5) e^{-0.5t} = -0.025 e^{-0.5t}$
+                            <br>
+                            $v = \\sin(2x - 20t) \\implies v' = \\cos(2x - 20t) \\cdot (-20) = -20 \\cos(2x - 20t)$
+                            <br><br>
+                            $v_y = (-0.025 e^{-0.5t})\\sin(2x - 20t) + (0.05 e^{-0.5t})(-20 \\cos(2x - 20t))$
+                            <br>
+                            $v_y = -0.025 e^{-0.5t} \\sin(2x - 20t) - 1.0 e^{-0.5t} \\cos(2x - 20t)$
+                            <br>
+                            Factorizando: <strong>$v_y = -e^{-0.5t} [0.025 \\sin(2x - 20t) + 1.0 \\cos(2x - 20t)]$</strong>
+                            <br><br>
+                            <strong>(b) Cálculo en $x=1.0, t=0.5$:</strong>
+                            <br>
+                            Exponencial: $e^{-0.5(0.5)} = e^{-0.25} \\approx 0.7788$
+                            <br>
+                            Argumento: $(2.0 \\cdot 1.0) - (20.0 \\cdot 0.5) = 2.0 - 10.0 = -8.0 \\, \\text{rad}$
+                            <br>
+                            $v_y = - (0.7788) [0.025 \\sin(-8.0) + 1.0 \\cos(-8.0)]$
+                            <br>
+                            $v_y \\approx - (0.7788) [0.025(-0.9893) + 1.0(-0.1455)]$
+                            <br>
+                            $v_y \\approx - (0.7788) [-0.0247 - 0.1455] = - (0.7788) [-0.1702]$
+                            <br>
+                            $v_y \\approx +0.1326 \, m/s$.
+                            <br>
+                            Redondeando: <strong>$+0.13 \, m/s$</strong>.`
+                }
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let isLinearMode = false;
+        const totalQuestions = quizData.length;
+
+        const startScreen = document.getElementById('start-screen');
+        const questionScreen = document.getElementById('question-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const linearModeBtn = document.getElementById('linear-mode-btn');
+        const selectModeBtn = document.getElementById('select-mode-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const backBtn = document.getElementById('back-btn');
+        const mainMenuBtn = document.getElementById('main-menu-btn');
+        const questionCounter = document.getElementById('question-counter');
+        const questionText = document.getElementById('question-text');
+        const circuitImageContainer = document.getElementById('circuit-image-container');
+        const circuitImage = document.getElementById('circuit-image');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackExplanation = document.getElementById('feedback-explanation');
+        const scoreDisplay = document.getElementById('score-display');
+        const progressBar = document.getElementById('progress-bar');
+        const questionContent = document.getElementById('question-content');
+        const rankText = document.getElementById('rank-text');
+        const problemList = document.getElementById('problem-list');
+        const modeSelectionBtns = document.getElementById('mode-selection-btns');
+        const hintBox = document.getElementById('hint-box');
+        const hintText = document.getElementById('hint-text');
+        const showTipBtn = document.getElementById('show-tip-btn');
+
+        showTipBtn.addEventListener('click', () => {
+            hintBox.classList.remove('hidden');
+            showTipBtn.classList.add('hidden');
+            renderLatex(hintBox);
+        });
+
+        function showNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                setupQuestion(currentQuestionIndex);
+                questionContent.classList.add('fade-in');
+            } else {
+                showResults();
+            }
+        }
+
+        function showPreviousQuestion() {
+            currentQuestionIndex--;
+            if (currentQuestionIndex >= 0) {
+                setupQuestion(currentQuestionIndex);
+                questionContent.classList.add('fade-in');
+            }
+        }
+
+        function showResults() {
+            startScreen.classList.add('hidden');
+            questionScreen.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+            scoreDisplay.textContent = `${score}/${totalQuestions}`;
+            const percentage = (score / totalQuestions) * 100;
+            let rank = "Aprendiz de Ondas";
+            if (percentage >= 75) rank = "Maestro del Espectro";
+            if (percentage == 100) rank = "Genio de la Vibración";
+            rankText.textContent = `RANGO OBTENIDO: ${rank}`;
+        }
+
+        function setupQuestion(qIndex) {
+            const questionData = quizData[qIndex];
+            
+            questionCounter.textContent = `PROBLEMA ${qIndex + 1} DE ${totalQuestions}`;
+            
+            // Reemplazar subsecciones como "(a) Texto." con un fuerte color para formato limpio.
+            // Esto asegura que la pregunta se vea profesional y no use asteriscos.
+            // let formattedQuestion = questionData.question.replace(/\((.)\)\s*(.*?)\./g, '<strong>($1) $2.</strong>');
+            // Dejando el formato original que usa <strong> para el número
+            questionText.innerHTML = questionData.question;
+
+            hintText.innerHTML = questionData.tip;
+
+            if (questionData.image_url) {
+                circuitImage.src = questionData.image_url;
+                circuitImageContainer.classList.remove('hidden');
+            } else {
+                circuitImageContainer.classList.add('hidden');
+            }
+            
+            optionsContainer.innerHTML = '';
+            let shuffledOptions = [...questionData.options];
+            shuffleArray(shuffledOptions);
+
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.innerHTML = option.text;
+                button.classList.add('option-btn', 'w-full', 'p-4', 'border-2', 'rounded-lg', 'text-left', 'font-medium');
+                button.dataset.isCorrect = option.correct ? 'true' : 'false';
+                button.onclick = () => selectAnswer(button, option);
+                optionsContainer.appendChild(button);
+            });
+            
+            feedbackContainer.classList.add('hidden');
+            hintBox.classList.add('hidden'); // Ocultar tip
+
+            // Mostrar el botón de tip
+            showTipBtn.classList.remove('hidden');
+            showTipBtn.disabled = false;
+
+            if (isLinearMode) {
+                if (currentQuestionIndex > 0) backBtn.classList.remove('hidden');
+                else backBtn.classList.add('hidden');
+
+                if (currentQuestionIndex < totalQuestions - 1) nextBtn.classList.remove('hidden');
+                else nextBtn.classList.add('hidden');
+            } else {
+                backBtn.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+            }
+            mainMenuBtn.classList.remove('hidden');
+            
+            renderLatex(questionContent);
+        }
+
+        let score = 0;
+        function selectAnswer(button, selectedOption) {
+            const optionButtons = optionsContainer.querySelectorAll('.option-btn');
+            optionButtons.forEach(btn => btn.disabled = true);
+            
+            const correctOption = quizData[currentQuestionIndex].options.find(opt => opt.correct);
+            const solutionContent = quizData[currentQuestionIndex].solution.text;
+            
+            feedbackExplanation.innerHTML = solutionContent;
+            
+            const iconCorrect = '✅';
+            const iconIncorrect = '❌';
+
+            if (selectedOption.correct) {
+                score++;
+                button.classList.add('correct');
+                feedbackContainer.className = 'p-4 rounded-lg mt-4 text-sm border-l-4 border-green-500 bg-green-900/50 text-green-200';
+                feedbackTitle.innerHTML = `${iconCorrect} <span>¡Correcto!</span>`;
+                feedbackTitle.className = 'font-bold text-lg mb-3 flex items-center text-green-400';
+            } else {
+                button.classList.add('incorrect');
+                feedbackContainer.className = 'p-4 rounded-lg mt-4 text-sm border-l-4 border-red-500 bg-red-900/50 text-red-200';
+                feedbackTitle.innerHTML = `${iconIncorrect} <span>Incorrecto. La respuesta correcta es: ${correctOption.text}</span>`;
+                feedbackTitle.className = 'font-bold text-lg mb-3 flex items-center text-red-400';
+
+                optionButtons.forEach(btn => {
+                    if (btn.dataset.isCorrect === 'true') {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+            
+            renderLatex(feedbackContainer);
+
+            feedbackContainer.classList.remove('hidden');
+            hintBox.classList.add('hidden'); // Ocultar tip al responder
+            showTipBtn.classList.add('hidden'); // Ocultar botón de tip al responder
+
+            if (isLinearMode) {
+                if (currentQuestionIndex > 0) backBtn.classList.remove('hidden');
+                if (currentQuestionIndex < totalQuestions - 1) nextBtn.classList.remove('hidden');
+            } else {
+                backBtn.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+            }
+            mainMenuBtn.classList.remove('hidden');
+
+            const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Home screen logic
+        function renderProblemList() {
+            problemList.innerHTML = '';
+            quizData.forEach((problem, index) => {
+                const problemBtn = document.createElement('button');
+                problemBtn.innerHTML = `Problema ${index + 1}: ${problem.name}`;
+                problemBtn.classList.add('option-btn', 'w-full', 'p-4', 'border-2', 'rounded-lg', 'text-left', 'font-medium');
+                problemBtn.onclick = () => {
+                    currentQuestionIndex = index;
+                    isLinearMode = false;
+                    startScreen.classList.add('hidden');
+                    questionScreen.classList.remove('hidden');
+                    setupQuestion(currentQuestionIndex);
+                };
+                problemList.appendChild(problemBtn);
+            });
+        }
+
+        linearModeBtn.addEventListener('click', () => {
+            isLinearMode = true;
+            currentQuestionIndex = 0;
+            score = 0;
+            startScreen.classList.add('hidden');
+            questionScreen.classList.remove('hidden');
+            setupQuestion(currentQuestionIndex);
+        });
+
+        selectModeBtn.addEventListener('click', () => {
+            modeSelectionBtns.classList.add('hidden');
+            problemList.classList.remove('hidden');
+            renderProblemList();
+        });
+
+        backBtn.addEventListener('click', showPreviousQuestion);
+        nextBtn.addEventListener('click', showNextQuestion);
+        mainMenuBtn.addEventListener('click', () => {
+            currentQuestionIndex = 0;
+            score = 0;
+            questionScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            modeSelectionBtns.classList.remove('hidden');
+            problemList.classList.add('hidden');
+        });
+        restartBtn.addEventListener('click', () => {
+            currentQuestionIndex = 0;
+            score = 0;
+            resultsScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            progressBar.style.width = `0%`;
+            modeSelectionBtns.classList.remove('hidden');
+            problemList.classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
