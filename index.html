@@ -672,10 +672,10 @@
                             (b) Calcule la velocidad transversal $v_y$ en $x = 1.0 \, m$ y $t = 0.5 \, s$.`,
                 tip: "Usa la <strong>regla del producto</strong> para derivar $y$ con respecto a $t$: $\\frac{d}{dt}(uv) = u'v + uv'$. Aquí, $u = 0.05 e^{-0.5t}$ y $v = \\sin(2x - 20t)$. No olvides la regla de la cadena.",
                 options: [
-                    { text: "a) $v_y = -e^{-0.5t}[0.025\\sin(...) + 1.0\\cos(...)]$; b) $+0.13 \, m/s$", correct: true },
-                    { text: "a) $v_y = -1.0e^{-0.5t}\\cos(...)$ (Olvidó regla de producto); b) $+0.11 \, m/s$", correct: false },
-                    { text: "a) $v_y = e^{-0.5t}[0.05\\sin(...) - 1.0\\cos(...)]$ (Error en derivada de $e$); b) $+0.15 \, m/s$", correct: false },
-                    { text: "a) $v_y = -e^{-0.5t}[...]$; b) $-0.13 \, m/s$ (Error de signo)", correct: false }
+                    { text: "a) $v_y = -e^{-0.5t}[0.025\\sin(2.0x - 20.0t) + 1.0\\cos(2.0x - 20.0t)]$; b) $+0.13 \, m/s$", correct: true },
+                    { text: "a) $v_y = -1.0e^{-0.5t}\\cos(2.0x - 20.0t)$; b) $+0.11 \, m/s$", correct: false },
+                    { text: "a) $v_y = e^{-0.5t}[0.05\\sin(2.0x - 20.0t) - 1.0\\cos(2.0x - 20.0t)]$; b) $+0.15 \, m/s$", correct: false },
+                    { text: "a) $v_y = -e^{-0.5t}[0.025\\sin(2.0x - 20.0t) + 1.0\\cos(2.0x - 20.0t)]$; b) $-0.13 \, m/s$", correct: false }
                 ],
                 solution: {
                     text: `<strong>(a) Expresión de $v_y$:</strong>
@@ -940,3 +940,6 @@
     </script>
 </body>
 </html>
+
+
+
